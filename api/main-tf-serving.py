@@ -32,9 +32,17 @@ async def predict(
         "instances": img_batch.tolist()
     }
 
-    requests.post(endpoint, json=json_data)
+    response = requests.post(endpoint, json=json_data)
+    prediction = np.array(response.json()["predictions"][0])
     
-    pass
+    predicted_class = CLASS_NAMES(np.argmax(prediction))
+    confidence = np.max(prediction)
+
+    return {
+        'class': predicted_class,
+        'confidence': float(confidence),
+    }
+# Run the FastAPI app
   
 
 if __name__ == "__main__":
