@@ -4,11 +4,12 @@ import numpy as np
 from io import BytesIO
 from PIL import Image
 import tensorflow as tf
+import requests
 
 app = FastAPI()
 
+endpoint = "http://localhost:8501/v1/models/potatoes_model:predict"  # Replace with your actual endpoint
 
-MODEL = tf.keras.models.load_model("../models/3")  # Load your model here
 
 CLASS_NAMES = ['Early Blight', 'Late Blight', 'Healthy']  # Replace with your actual class names
 
@@ -27,15 +28,14 @@ async def predict(
     image = read_file_as_image(await file.read()) # put first thread in suspend mode so second thread can run
     img_batch = np.expand_dims(image, axis=0)  # Add batch dimension
 
-
-    predictions = MODEL.predict(img_batch)  # Predict the class of the image
-    predicted_class = CLASS_NAMES[np.argmax(predictions[0])]
-    confidence = np.max(predictions[0])  # Get the maximum prediction value
-
-    return {
-        'clss': predicted_class,
-        'confidence': float(confidence),
+    json_data = {
+        "instances": img_batch.tolist()
     }
+
+    requests.post(endpoint, json=json_data)
+    
+    pass
+  
 
 if __name__ == "__main__":
     uvicorn.run(app, host='localhost', port=8000)
