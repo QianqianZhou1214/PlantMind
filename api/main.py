@@ -22,7 +22,7 @@ app.add_middleware(
 )
 
 
-MODEL = tf.keras.models.load_model("../models/3")  # Load your model here
+MODEL = tf.saved_model.load("../models/4")  # Load your model here
 
 CLASS_NAMES = ['Early Blight', 'Late Blight', 'Healthy']  # Replace with your actual class names
 
